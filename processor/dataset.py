@@ -72,8 +72,7 @@ class MMREDataset(Dataset):
         self.max_seq = max_seq
         self.img_path = img_path[mode] if img_path is not None else img_path
         self.aux_img_path = aux_img_path[mode] if aux_img_path is not None else aux_img_path
-        # self.rcnn_img_path = '../data/MEGA/crops'
-        self.rcnn_img_path = '/home/data_91_c/wanghk/MEGA'
+        self.rcnn_img_path = '../data'
         self.mode = mode
         self.data_dict = self.processor.load_from_file(mode)
 
@@ -82,8 +81,6 @@ class MMREDataset(Dataset):
         self.rcnn_box_dict = {}
         self.aux_box_dict.update(torch.load('/home/data_91_c/wanghk/MEGA/spatial_feature/' + mode + '_vg_box_dict.pth'))
         self.rcnn_box_dict.update(torch.load('/home/data_91_c/wanghk/MEGA/spatial_feature/' + mode + '_detect_box_dict.pth'))
-        # self.cap_dict = json.load(open(f'../../Qwen-VL/caption/v2/Qwen-VL-Chat.{mode}', 'r'))
-        # print('load caption dict: ', len(self.cap_dict))
 
         self.re_dict = self.processor.get_relation_dict()
         self.tokenizer = self.processor.tokenizer
@@ -122,10 +119,6 @@ class MMREDataset(Dataset):
         draw.rectangle([left, top, right, bottom], outline=rectangle_color, width=3)
         return image
 
-    def add_special_tags(self, sentence, target_word, start_tag, end_tag):
-        # 在目标单词前后添加特殊标记
-        modified_sentence = sentence.replace(target_word, f"{start_tag} {target_word} {end_tag}")
-        return modified_sentence
 
     def __getitem__(self, idx):
         word_list, relation, head_d, tail_d, imgid = self.data_dict['words'][idx], self.data_dict['relations'][idx], \

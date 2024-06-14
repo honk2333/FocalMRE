@@ -16,8 +16,6 @@ from transformers.modeling_outputs import BaseModelOutput, BaseModelOutputWithPo
 from .modeling_bert import *
 from .modeling_clip import *
 from .selective_attention import SelectiveAttention
-from .gumbel import gumbel_softmax_sampling
-
 
 class UnimoModel(nn.Module):
     def __init__(self, vision_config, text_config, aux_num, rcnn_num):
@@ -68,8 +66,6 @@ class UnimoModel(nn.Module):
         merge = torch.cat([a, b], dim=-1)
         gate = torch.sigmoid(func(merge))
         res = (1 - gate) * b + gate * a
-        # 计算 gate 的均值
-        gate_mean = torch.mean(gate)
         return res
 
     def fuse_img_feat(self, text, idx, image):
@@ -78,8 +74,6 @@ class UnimoModel(nn.Module):
         output, _map = self.selective_attns[idx](query=text, key=image, value=image, )  # t, b, c
         res = self.fuse(output, text, self.gate_denses[idx])
         return res
-        # # 不使用Gate
-        # return output
 
     def forward(
             self,
@@ -88,7 +82,6 @@ class UnimoModel(nn.Module):
             token_type_ids=None,
             box_imgs=None,
             obj_imgs=None,
-            img_mask=None,
             output_attentions=None,
             output_hidden_states=None,
             return_dict=None,

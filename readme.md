@@ -14,6 +14,9 @@ We also use the detected visual objects provided in previous work, which can be 
     wget 120.27.214.45/Data/re/multimodal/data.tar.gz
     tar -xzvf data.tar.gz
 ```
+We organize the coordinate of the region into a dictionary for easy loading, which can be download from:
+
+
 ## Dependencies
 Install all necessary dependencies:
 ```shell

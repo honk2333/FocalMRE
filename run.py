@@ -37,31 +37,31 @@ MODEL_CLASS = {
 }
 
 DATA_PATH = {
-    'MRE': {'train': '/home/data_91_c/wanghk/MEGA/txt/ours_train.txt',
-            'dev': '/home/data_91_c/wanghk/MEGA/txt/ours_val.txt',
-            'test': '/home/data_91_c/wanghk/MEGA/txt/ours_test.txt',
-            'train_auximgs': '/home/data_91_c/wanghk/MEGA/txt/mre_train_dict.pth',  # {data_id : object_crop_img_path}
-            'dev_auximgs': '/home/data_91_c/wanghk/MEGA/txt/mre_dev_dict.pth',
-            'test_auximgs': '/home/data_91_c/wanghk/MEGA/txt/mre_test_dict.pth',
-            'train_img2crop': '/home/data_91_c/wanghk/MEGA/img_detect/train/train_img2crop.pth',
-            'dev_img2crop': '/home/data_91_c/wanghk/MEGA/img_detect/val/val_img2crop.pth',
-            'test_img2crop': '/home/data_91_c/wanghk/MEGA/img_detect/test/test_img2crop.pth'
+    'MRE': {'train': 'data/txt/ours_train.txt',
+            'dev': 'data/txt/ours_val.txt',
+            'test': 'data/txt/ours_test.txt',
+            'train_auximgs': 'data/txt/mre_train_dict.pth',  # {data_id : object_crop_img_path}
+            'dev_auximgs': 'data/txt/mre_dev_dict.pth',
+            'test_auximgs': 'data/txt/mre_test_dict.pth',
+            'train_img2crop': 'data/img_detect/train/train_img2crop.pth',
+            'dev_img2crop': 'data/img_detect/val/val_img2crop.pth',
+            'test_img2crop': 'data/img_detect/test/test_img2crop.pth'
             }
 }
 
 IMG_PATH = {
-    'MRE': {'train': '/home/data_91_c/wanghk/MEGA/img_org/train/',
-            'dev': '/home/data_91_c/wanghk/MEGA/img_org/val/',
-            'test': '/home/data_91_c/wanghk/MEGA/img_org/test'}}
+    'MRE': {'train': 'data/img_org/train/',
+            'dev': 'data/img_org/val/',
+            'test': 'data/img_org/test'}}
 
 AUX_PATH = {
     'MRE': {
-        'train': '/home/data_91_c/wanghk/MEGA/img_vg/train/crops',
-        'dev': '/home/data_91_c/wanghk/MEGA/img_vg/val/crops',
-        'test': '/home/data_91_c/wanghk/MEGA/img_vg/test/crops'
+        'train': 'data/img_vg/train/crops',
+        'dev': 'data/img_vg/val/crops',
+        'test': 'data/img_vg/test/crops'
     }
 }
-re_path = '/home/data_91_c/wanghk/MEGA/ours_rel2id.json'
+re_path = 'data/ours_rel2id.json'
 
 
 def set_seed(seed=2021):
