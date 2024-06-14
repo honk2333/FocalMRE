@@ -2,4 +2,4 @@
 /.idea
 /data
 
-!/data/*_box_dict.pth
+!*_box_dict.pth
