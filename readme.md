@@ -34,7 +34,8 @@ You can simply run the bash script for multimodal relation extraction:
 ```
 
 ## Test the model
-The best model is:
+The best model can be download for testing from the following link:
+
 
 You can simply run the bash script for multimodal relation extraction:
 ```shell
