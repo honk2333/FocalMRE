@@ -86,7 +86,7 @@ class BertTrainer(object):
                         avg_loss = 0
 
                 if epoch >= self.args.eval_begin_epoch:
-                    # self.evaluate(epoch)  # generator to dev.
+                    self.evaluate(epoch)  # generator to dev.
                     self.test(epoch)
 
             pbar.close()
@@ -206,47 +206,6 @@ class BertTrainer(object):
                     if self.args.save_path is not None:  # save model
                         torch.save(self.model.state_dict(), self.args.save_path + "/best_model.pth")
                         self.logger.info("Save best model at {}".format(self.args.save_path))
-
-        self.model.train()
-
-    def predict(self):
-        self.model.eval()
-        self.logger.info("\n***** Running predicting *****")
-        self.logger.info("  Num instance = %d", len(self.test_data) * self.args.batch_size)
-        self.logger.info("  Batch size = %d", self.args.batch_size)
-
-        true_labels, pred_labels = [], []
-        with torch.no_grad():
-            with tqdm(total=len(self.test_data), leave=False, dynamic_ncols=True) as pbar:
-                pbar.set_description_str(desc="Predicting")
-                total_loss = 0
-                for batch in self.test_data:
-                    batch = (tup.to(self.args.device) if isinstance(tup, torch.Tensor) else tup for tup in batch)  # to cpu/cuda device
-                    (loss, logits), labels = self._step(batch, mode="dev")  # logits: batch, 3
-                    total_loss += loss.detach().cpu().item()
-
-                    preds = logits.argmax(-1)
-                    true_labels.extend(labels.view(-1).detach().cpu().tolist())
-                    pred_labels.extend(preds.view(-1).detach().cpu().tolist())
-
-                    pbar.update()
-                # evaluate done
-                pbar.close()
-                sk_result = classification_report(y_true=true_labels, y_pred=pred_labels,
-                                                  labels=list(self.re_dict.values())[1:],
-                                                  target_names=list(self.re_dict.keys())[1:], digits=4)
-                self.logger.info("%s\n", sk_result)
-                # save predict results
-                import os
-                def get_key(dic, value):
-                    return [k for k, v in dic.items() if v == value][0]
-
-                with open(os.path.join(self.args.save_path, 'result.txt'), 'w', encoding="utf-8") as wf:
-                    for a, b in zip(true_labels, pred_labels):
-                        wf.write("true: " + get_key(self.re_dict, a) + "\t, pred: " + get_key(self.re_dict, b) + "\n")
-                    wf.write(sk_result)
-                    print('Successful write!!')
-
         self.model.train()
 
     def _step(self, batch, mode="train"):
