@@ -1,11 +1,12 @@
 
 ## Data preprocessing
 ### MNRE dataset
-Due to the large size of MNRE dataset, please download the dataset from the original repository.
+Due to the large size of MNRE dataset, please download the dataset from [original repository](https://github.com/thecharm/MNRE). 
 
-Unzip the data and rename the directory as mnre, which should be placed in the directory data:
+Unzip the data and place them in the directory `data`
+
 ```shell
-mkdir data ckpt
+mkdir ckpt
 ```
 We also use the detected visual objects provided in previous work, which can be downloaded using the commend:
 
