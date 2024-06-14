@@ -33,3 +33,11 @@ You can simply run the bash script for multimodal relation extraction:
   sh run_mre.sh
 ```
 
+## Test the model
+The best model is:
+
+You can simply run the bash script for multimodal relation extraction:
+```shell
+    sh run_test.sh
+```
+

@@ -118,7 +118,6 @@ def main():
     writer = None
     if args.do_train:
         clip_processor = CLIPProcessor.from_pretrained(args.vit_name)
-
         processor = data_process(data_path, re_path, args.bert_name, clip_processor=clip_processor, )
 
         train_dataset = dataset_class(processor, args, img_path, ent_path, args.max_seq, args.aux_size, args.rcnn_size, mode='train')
@@ -153,7 +152,32 @@ def main():
                               re_dict=re_dict, model=model, args=args, logger=logger, writer=writer)
         trainer.train()
         torch.cuda.empty_cache()
+    if args.do_test:
+        clip_processor = CLIPProcessor.from_pretrained(args.vit_name)
+        processor = data_process(data_path, re_path, args.bert_name, clip_processor=clip_processor, )
+        test_dataset = dataset_class(processor, args, img_path, ent_path, args.max_seq, args.aux_size, args.rcnn_size, mode='test')
+        test_dataloader = DataLoader(test_dataset, batch_size=args.batch_size, shuffle=False, num_workers=4, pin_memory=True)
+        re_dict = processor.get_relation_dict()
+        num_labels = len(re_dict)
+        tokenizer = processor.tokenizer
 
+        clip_model = CLIPModel.from_pretrained(args.vit_name)
+        clip_vit = clip_model.vision_model
+        bert_model = AutoModel.from_pretrained(args.bert_name)
+
+        config = CLIPConfig.from_pretrained(args.vit_name)
+        vision_config = config.vision_config
+        text_config = AutoConfig.from_pretrained(args.bert_name)
+
+        clip_model_dict = clip_vit.state_dict()
+        text_model_dict = bert_model.state_dict()
+
+        model = REModel(num_labels, tokenizer, args, vision_config, text_config, clip_model_dict, text_model_dict)
+        model = torch.nn.DataParallel(model)
+        model = model.to(args.device)
+        trainer = BertTrainer(train_data=None, dev_data=None, test_data=test_dataloader,
+                              re_dict=re_dict, model=model, args=args, logger=logger, writer=writer)
+        trainer.test(-1)
 
 if __name__ == "__main__":
     main()

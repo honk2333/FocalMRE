@@ -72,15 +72,14 @@ class MMREDataset(Dataset):
         self.max_seq = max_seq
         self.img_path = img_path[mode] if img_path is not None else img_path
         self.aux_img_path = aux_img_path[mode] if aux_img_path is not None else aux_img_path
-        self.rcnn_img_path = '../data'
+        self.rcnn_img_path = 'data/'
         self.mode = mode
         self.data_dict = self.processor.load_from_file(mode)
 
-        # # spatial feature
         self.aux_box_dict = {}
         self.rcnn_box_dict = {}
-        self.aux_box_dict.update(torch.load('/home/data_91_c/wanghk/MEGA/spatial_feature/' + mode + '_vg_box_dict.pth'))
-        self.rcnn_box_dict.update(torch.load('/home/data_91_c/wanghk/MEGA/spatial_feature/' + mode + '_detect_box_dict.pth'))
+        self.aux_box_dict.update(torch.load('data/' + mode + '_vg_box_dict.pth'))
+        self.rcnn_box_dict.update(torch.load('data/' + mode + '_detect_box_dict.pth'))
 
         self.re_dict = self.processor.get_relation_dict()
         self.tokenizer = self.processor.tokenizer
@@ -95,14 +94,7 @@ class MMREDataset(Dataset):
     def __len__(self):
         return len(self.data_dict['words'])
 
-    def convert_box1(self, box):
-        x = float(box[0]) - float(box[2]) / 2.0
-        w = float(box[2])
-        y = float(box[1]) - float(box[3]) / 2.0
-        h = float(box[3])
-        return x, y, w, h
-
-    def convert_box2(self, box, dw, dh):
+    def convert(self, box, dw, dh):
         x = float(box[0]) - float(box[2]) / 2.0
         x *= dw
         w = float(box[2]) * dw
@@ -114,8 +106,7 @@ class MMREDataset(Dataset):
     def draw_rect(self, ori_image, box, dw, dh, rectangle_color):
         image = ori_image.copy()
         draw = ImageDraw.Draw(image)
-        # rectangle_color = (255, 0, 0)  # 红色 (R, G, B)
-        left, top, right, bottom = self.convert_box2(box, dw, dh)
+        left, top, right, bottom = self.convert(box, dw, dh)
         draw.rectangle([left, top, right, bottom], outline=rectangle_color, width=3)
         return image
 
@@ -156,7 +147,6 @@ class MMREDataset(Dataset):
         box_imgs = []
         # detected object img
         aux_num = self.aux_num
-        aux_global = image
         aux_img_paths = []
         if item_id in self.data_dict['aux_imgs']:
             aux_img_paths = self.data_dict['aux_imgs'][item_id]
@@ -165,25 +155,18 @@ class MMREDataset(Dataset):
         for i in range(min(aux_num, len(aux_img_paths))):
             bbox = list(self.aux_box_dict[aux_img_paths[i].split('/')[-1]])
             width, height = image.size
-            # Obj Image
-            # left, top, right, bottom = self.convert_box2(bbox[:4], width, height)
-            # aux_img = image.crop((left, top, right, bottom))
-            # box_imgs.append(self.clip_processor(images=aux_img, return_tensors='pt')['pixel_values'].squeeze())
             # Focal Image
             box_imgs.append(self.clip_processor(images=self.draw_rect(image, bbox[:4], width, height, (255, 0, 0)), return_tensors='pt')['pixel_values'].squeeze())
-            # aux_global = self.draw_rect(aux_global, bbox[:4], width, height, (255, 0, 0))
 
         # padding
         for i in range(aux_num - len(box_imgs)):
             box_imgs.append(torch.zeros((3, 224, 224)))
 
-        # assert len(aux_imgs) == aux_num
         assert len(box_imgs) == aux_num
 
         rcnn_num = self.rcnn_num
         rcnn_img_paths = []
         imgid = imgid.split(".")[0]
-        rcnn_global = image
         if imgid in self.data_dict['rcnn_imgs']:
             rcnn_img_paths = self.data_dict['rcnn_imgs'][imgid]
             rcnn_img_paths = [os.path.join(self.rcnn_img_path, path) for path in rcnn_img_paths]
@@ -191,13 +174,8 @@ class MMREDataset(Dataset):
         for i in range(min(rcnn_num, len(rcnn_img_paths))):
             bbox = list(self.rcnn_box_dict[rcnn_img_paths[i].split('/')[-1]])
             width, height = image.size
-            # Obj Image
-            # left, top, right, bottom = self.convert_box2(bbox[:4], width, height)
-            # rcnn_img = image.crop((left, top, right, bottom))
-            # box_imgs.append(self.clip_processor(images=rcnn_img, return_tensors='pt')['pixel_values'].squeeze())
             # Focal Image
             box_imgs.append(self.clip_processor(images=self.draw_rect(image, bbox[:4], width, height, (0, 0, 255)), return_tensors='pt')['pixel_values'].squeeze())
-            # rcnn_global = self.draw_rect(rcnn_global, bbox[:4], width, height)
 
         for i in range(rcnn_num + aux_num - len(box_imgs)):
             box_imgs.append(torch.zeros((3, 224, 224)))
@@ -205,10 +183,5 @@ class MMREDataset(Dataset):
         assert len(box_imgs) == rcnn_num + aux_num
 
         image = self.clip_processor(images=image, return_tensors='pt')['pixel_values'].squeeze()
-        # aux_global = self.clip_processor(images=aux_global, return_tensors='pt')['pixel_values'].squeeze()
-        # rcnn_global = self.clip_processor(images=rcnn_global, return_tensors='pt')['pixel_values'].squeeze()
-        # box_imgs.append(aux_global)
-        # box_imgs.append(rcnn_global)
-        # box_imgs = [image] * 7
         box_imgs = torch.stack(box_imgs, dim=0)
-        return input_ids, token_type_ids, attention_mask, torch.tensor(re_label), image, box_imgs,  # torch.cat([aux_imgs, rcnn_imgs], dim=0),  # , img_mask  # obj_imgs
+        return input_ids, token_type_ids, attention_mask, torch.tensor(re_label), image, box_imgs

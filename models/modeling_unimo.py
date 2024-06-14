@@ -81,7 +81,6 @@ class UnimoModel(nn.Module):
             attention_mask=None,
             token_type_ids=None,
             box_imgs=None,
-            obj_imgs=None,
             output_attentions=None,
             output_hidden_states=None,
             return_dict=None,

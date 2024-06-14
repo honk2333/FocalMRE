@@ -59,15 +59,10 @@ class REModel(nn.Module):
             attention_mask=None,
             labels=None,
             box_imgs=None,
-            obj_imgs=None,
-            img_mask=None,
     ):
         bsz = input_ids.size(0)
-        # 找到所有等于 self.head_start 和 self.tail_start 的位置
         head_mask = (input_ids == self.head_start)
         tail_mask = (input_ids == self.tail_start)
-
-        # 找到非零位置的索引
         head_idxs = head_mask.nonzero()[:, 1]
         tail_idxs = tail_mask.nonzero()[:, 1]
 
@@ -75,8 +70,6 @@ class REModel(nn.Module):
                                      token_type_ids=token_type_ids,
                                      attention_mask=attention_mask,
                                      box_imgs=box_imgs,
-                                     obj_imgs=obj_imgs,
-                                     img_mask=img_mask,
                                      return_dict=True, )
         last_hidden_state = output.last_hidden_state
         bsz, sequence_len, hidden_size = last_hidden_state.shape

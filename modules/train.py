@@ -7,8 +7,6 @@ from sklearn.metrics import classification_report
 from transformers.optimization import get_linear_schedule_with_warmup
 
 from .metrics import eval_result
-from .BalancedDataParallel import BalancedDataParallel
-
 
 class BertTrainer(object):
     def __init__(self, train_data=None, dev_data=None, test_data=None, re_dict=None, model=None, process=None,
@@ -18,9 +16,6 @@ class BertTrainer(object):
         self.test_data = test_data
         self.re_dict = re_dict
         self.model = model
-        # self.model = torch.nn.DataParallel(self.model)
-        # self.model = self.model.cuda()
-        # print(next(self.model.parameters()).device)
 
         self.process = process
         self.logger = logger
@@ -54,10 +49,6 @@ class BertTrainer(object):
         self.logger.info("  Learning rate = {}".format(self.args.lr))
         self.logger.info("  Evaluate begin = %d", self.args.eval_begin_epoch)
 
-        # if self.args.load_path is not None:  # load model from load_path
-        #     self.logger.info("Loading model from {}".format(self.args.load_path))
-        #     self.model.load_state_dict(torch.load(self.args.load_path))
-        #     self.logger.info("Load model successful!")
 
         with tqdm(total=self.train_num_steps, postfix='loss:{0:<6.5f}', leave=False, dynamic_ncols=True,
                   initial=self.step) as pbar:
@@ -91,9 +82,9 @@ class BertTrainer(object):
 
             pbar.close()
             self.pbar = None
-            # self.logger.info("Get best dev performance at epoch {}, best dev f1 score is {}, acc = {}".format(self.best_dev_epoch,
-            #                                                                                                   self.best_dev_metric,
-            #                                                                                                   self.dev_acc))
+            self.logger.info("Get best dev performance at epoch {}, best dev f1 score is {}, acc = {}".format(self.best_dev_epoch,
+                                                                                                              self.best_dev_metric,
+                                                                                                              self.dev_acc))
             self.logger.info("Get best test performance at epoch {}, best test f1 score is {}, acc = {}".format(self.best_test_epoch,
                                                                                                                 self.best_test_metric,
                                                                                                                 self.test_acc))
@@ -164,6 +155,11 @@ class BertTrainer(object):
         self.logger.info("  Num instance = %d", len(self.test_data) * self.args.batch_size)
         self.logger.info("  Batch size = %d", self.args.batch_size)
 
+        if self.args.load_path is not None:  # load model from load_path
+            self.logger.info("Loading model from {}".format(self.args.load_path))
+            self.model.load_state_dict(torch.load(self.args.load_path))
+            self.logger.info("Load model successful!")
+
         true_labels, pred_labels = [], []
         with torch.no_grad():
             with tqdm(total=len(self.test_data), leave=False, dynamic_ncols=True) as pbar:
@@ -210,7 +206,7 @@ class BertTrainer(object):
 
     def _step(self, batch, mode="train"):
         input_ids, token_type_ids, attention_mask, labels, images, box_imgs, = batch
-        outputs = self.model(input_ids=input_ids, token_type_ids=token_type_ids, attention_mask=attention_mask, labels=labels, box_imgs=box_imgs, obj_imgs=None, img_mask=None)
+        outputs = self.model(input_ids=input_ids, token_type_ids=token_type_ids, attention_mask=attention_mask, labels=labels, box_imgs=box_imgs)
         return outputs, labels
 
     def before_multimodal_train(self):
@@ -221,28 +217,8 @@ class BertTrainer(object):
             if 'model' in name:
                 params['params'].append(param)
         optimizer_grouped_parameters.append(params)
-
         self.optimizer = optim.AdamW(optimizer_grouped_parameters, lr=self.args.lr)
-        # params = list(self.model.named_parameters())
-        # no_decay = ['bias', 'LayerNorm.bias', 'LayerNorm.weight']
-        # grouped_params = [
-        #     {
-        #         'params': [p for n, p in params if not any(nd in n for nd in no_decay)],
-        #         'weight_decay': 0.01,
-        #         'lr': self.args.lr,
-        #         'ori_lr': self.args.lr
-        #     },
-        #     {
-        #         'params': [p for n, p in params if any(nd in n for nd in no_decay)],
-        #         'weight_decay': 0.0,
-        #         'lr': self.args.lr,
-        #         'ori_lr': self.args.lr
-        #     }
-        # ]
-        # self.optimizer = AdamW(grouped_params, correct_bias=False)
         self.scheduler = get_linear_schedule_with_warmup(optimizer=self.optimizer,
                                                          num_warmup_steps=self.args.warmup_ratio * self.train_num_steps,
                                                          num_training_steps=self.train_num_steps)
         self.model.to(self.args.device)
-        # for name, par in self.model.named_parameters():
-        #     print(name, par.requires_grad)
