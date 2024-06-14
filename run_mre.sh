@@ -12,7 +12,7 @@ CUDA_VISIBLE_DEVICES=3 python run.py \
   --lr=1e-5 \
   --warmup_ratio=0.08 \
   --eval_begin_epoch=1 \
-  --seed=123 \
+  --seed=1234 \
   --do_train \
   --max_seq=128 \
   --aux_size=224 \

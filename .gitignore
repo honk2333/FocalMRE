@@ -1,3 +1,5 @@
 /ckpt
 /.idea
 /data
+
+!/data/*_box_dict.pth
