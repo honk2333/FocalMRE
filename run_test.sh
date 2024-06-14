@@ -1,6 +1,6 @@
 DATASET_NAME="MRE"
-BERT_NAME='/home/data_91_d/wanghk/bert-base-uncased'
-VIT_NAME="/home/data_91_d/wanghk/clip-vit-base-patch32"
+BERT_NAME='bert-base-uncased'
+VIT_NAME="clip-vit-base-patch32"
 
 CUDA_VISIBLE_DEVICES=0 python -u run.py \
   --model_name="bert" \
@@ -15,5 +15,4 @@ CUDA_VISIBLE_DEVICES=0 python -u run.py \
   --rcnn_size=224 \
   --aux_num 4 \
   --rcnn_num 3 \
-  --save_path="/home/nfs03/wanghk/ckpt" \
   --load_path="ckpt/best_model.pth"

@@ -114,7 +114,7 @@ def main():
     # logdir = "logs/" + args.model_name + "_" + args.dataset_name + "_" + str(args.batch_size) + "_" + str(
     #     args.lr) + args.notes
 
-    # writer = SummaryWriter(logdir="/home/nfs03/wanghk/ckpt/logs/" + formatted_datetime)
+    # writer = None
     writer = None
     if args.do_train:
         clip_processor = CLIPProcessor.from_pretrained(args.vit_name)
