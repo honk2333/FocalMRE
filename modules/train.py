@@ -133,21 +133,11 @@ class BertTrainer(object):
                     self.best_dev_epoch = epoch
                     self.best_dev_metric = micro_f1  # update best metric(f1 score)
                     self.dev_acc = acc
-                    # if self.args.save_path is not None:  # save model
-                    #     torch.save(self.model.state_dict(), self.args.save_path + "/best_model.pth")
-                    #     self.logger.info("Save best model at {}".format(self.args.save_path))
+                    if self.args.save_path is not None:  # save model
+                        torch.save(self.model.state_dict(), self.args.save_path + "/best_model.pth")
+                        self.logger.info("Save best model at {}".format(self.args.save_path))
 
         self.model.train()
-
-    def save_pred(self, true_labels, pred_labels, sk_result):
-        def get_key(dic, value):
-            return [k for k, v in dic.items() if v == value][0]
-
-        with open(os.path.join(self.args.save_path, 'pred.txt'), 'w', encoding="utf-8") as wf:
-            for a, b in zip(true_labels, pred_labels):
-                wf.write("true: " + get_key(self.re_dict, a) + "\t, pred: " + get_key(self.re_dict, b) + "\n")
-            wf.write(sk_result)
-            print('Successful write!!')
 
     def test(self, epoch):
         self.model.eval()
@@ -198,10 +188,7 @@ class BertTrainer(object):
                     self.best_test_metric = micro_f1
                     self.best_test_epoch = epoch
                     self.test_acc = acc
-                    self.save_pred(true_labels, pred_labels, sk_result)
-                    if self.args.save_path is not None:  # save model
-                        torch.save(self.model.state_dict(), self.args.save_path + "/best_model.pth")
-                        self.logger.info("Save best model at {}".format(self.args.save_path))
+
         self.model.train()
 
     def _step(self, batch, mode="train"):
