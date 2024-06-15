@@ -15,8 +15,6 @@ cd data/
 wget 120.27.214.45/Data/re/multimodal/data.tar.gz
 tar -xzvf data.tar.gz
 ```
-We organize the coordinate of the region into a dictionary for easy loading, which can be download from:
-
 
 ## Dependencies
 Install all necessary dependencies:
@@ -34,12 +32,4 @@ You can simply run the bash script for multimodal relation extraction:
 sh run_mre.sh
 ```
 
-## Test the model
-The best model can be download for testing from the following link:
-
-
-You can simply run the bash script for multimodal relation extraction:
-```shell
-sh run_test.sh
-```
 

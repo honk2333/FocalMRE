@@ -8,6 +8,7 @@ from transformers.optimization import get_linear_schedule_with_warmup
 
 from .metrics import eval_result
 
+
 class BertTrainer(object):
     def __init__(self, train_data=None, dev_data=None, test_data=None, re_dict=None, model=None, process=None,
                  args=None, logger=None, writer=None) -> None:
@@ -48,7 +49,6 @@ class BertTrainer(object):
         self.logger.info("  Batch size = %d", self.args.batch_size)
         self.logger.info("  Learning rate = {}".format(self.args.lr))
         self.logger.info("  Evaluate begin = %d", self.args.eval_begin_epoch)
-
 
         with tqdm(total=self.train_num_steps, postfix='loss:{0:<6.5f}', leave=False, dynamic_ncols=True,
                   initial=self.step) as pbar:
@@ -116,7 +116,7 @@ class BertTrainer(object):
                 sk_result = classification_report(y_true=true_labels, y_pred=pred_labels,
                                                   labels=list(self.re_dict.values())[1:],
                                                   target_names=list(self.re_dict.keys())[1:], digits=4)
-                # self.logger.info("%s\n", sk_result)
+                self.logger.info("%s\n", sk_result)
                 result = eval_result(true_labels, pred_labels, self.re_dict, self.logger)
                 acc, micro_p, micro_r, micro_f1 = round(result['acc'] * 100, 4), round(result['micro_p'] * 100, 4), round(result['micro_r'] * 100, 4), round(result['micro_f1'] * 100, 4)
                 if self.writer is not None:
@@ -180,10 +180,8 @@ class BertTrainer(object):
                     self.writer.add_scalar(tag='test_r', scalar_value=micro_r, global_step=epoch)  # tensorbordx
                     self.writer.add_scalar(tag='test_f1', scalar_value=micro_f1, global_step=epoch)  # tensorbordx
                     self.writer.add_scalar(tag='test_loss', scalar_value=total_loss / len(self.test_data), global_step=epoch)  # tensorbordx
-                total_loss = 0
                 self.logger.info("Epoch {}/{}, best test f1: {}, best epoch: {}, current test f1 score: {}, acc: {}" \
-                                 .format(epoch, self.args.num_epochs, self.best_test_metric, self.best_test_epoch,
-                                         micro_f1, acc))
+                                 .format(epoch, self.args.num_epochs, self.best_test_metric, self.best_test_epoch, micro_f1, acc))
                 if micro_f1 >= self.best_test_metric:  # this epoch get best performance
                     self.best_test_metric = micro_f1
                     self.best_test_epoch = epoch

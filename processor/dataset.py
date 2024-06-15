@@ -139,7 +139,6 @@ class MMREDataset(Dataset):
         img_path = os.path.join(self.img_path, imgid)
         image = Image.open(img_path).convert('RGB')
 
-        # 单句子编码
         encode_dict = self.tokenizer.encode_plus(text=extend_word_list, max_length=self.max_seq, truncation=True, padding='max_length')
         input_ids, token_type_ids, attention_mask = encode_dict['input_ids'], encode_dict['token_type_ids'], encode_dict['attention_mask']
         input_ids, token_type_ids, attention_mask = torch.tensor(input_ids), torch.tensor(token_type_ids), torch.tensor(attention_mask)
