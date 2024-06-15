@@ -1,4 +1,3 @@
-
 ## Data preprocessing
 ### MNRE dataset
 Due to the large size of MNRE dataset, please download the dataset from [original repository](https://github.com/thecharm/MNRE). 
@@ -31,5 +30,4 @@ You can simply run the bash script for multimodal relation extraction:
 ```shell
 sh run_mre.sh
 ```
-
 
