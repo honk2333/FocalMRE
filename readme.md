@@ -20,13 +20,9 @@ tar -xzvf data.tar.gz
 Install all necessary dependencies:
 
 ```shell
-
 conda create -n focalmre python==3.7
-
 conda activate focalmre
-
 pip install -r requirements.txt
-
 ```
 
 
@@ -34,15 +30,19 @@ pip install -r requirements.txt
 
 The best hyperparameters we found have been witten in run_mre.sh file.
 
-
-You can simply run the bash script for multimodal relation extraction:
+You can simply run the script for multimodal relation extraction:
 
 ```shell
-
 sh run_mre.sh
-
 ```
 
 ## Test the model
+
+You can simply run the script to test saved checkpoint:
+
+```shell
+sh run_test.sh
+```
+
 Anonymous Repository is unable to upload large model files. Considering anonymity, we are temporarily unable to upload checkpoint to the cloud storage. All materials will be made public later.
 
