@@ -31,3 +31,6 @@ You can simply run the bash script for multimodal relation extraction:
 sh run_mre.sh
 ```
 
+## Test the model
+Anonymous Repository is unable to upload large model files. Considering anonymity, we are temporarily unable to upload checkpoint to the cloud storage. All materials will be made public later.
+
