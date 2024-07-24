@@ -44,5 +44,5 @@ You can simply run the script to test saved checkpoint:
 sh run_test.sh
 ```
 
-Anonymous Repository is unable to upload large model files. Considering anonymity, we are temporarily unable to upload checkpoint to the cloud storage. All materials will be made public later.
+You can use our fine-tuned models for testing, which can be downloaded from the following link: https://drive.google.com/file/d/1Nff_sSB4n7p_qoE9ryK7qxmAYSW1TF2z/view?usp=sharing
 
